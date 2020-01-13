@@ -46,7 +46,7 @@
 void
 usage()
 {
-    fprintf(stderr, "usage: scrypt {key} {salt base} {salt separator} {input} {rounds} {memcost} [-P]\n");
+    fprintf(stderr, "usage: scrypt {key} {salt base} {salt separator} {rounds} {memcost} [-P]\n");
     exit(1);
 }
 
@@ -103,16 +103,15 @@ main(int argc, char *argv[])
         usage();
     }
 
-    char   * key,  * salt,  * saltbase,  * saltsep,  * passwd;
-    size_t keylen, saltlen, saltbaselen, saltseplen, passwdlen;
+    char * key,  * salt, * saltbase, * saltsep, * passwd;
+    size_t keylen, saltlen, saltbaselen, saltseplen;
     int rounds;
     int memcost;
 
     keylen = decodeBase64(argv[1], &key);
     saltbaselen = decodeBase64(argv[2], &saltbase);
     saltseplen = decodeBase64(argv[3], &saltsep);
-    passwdlen = decodeBase64(argv[4], &passwd);
-
+    passwd = argv[4];
     rounds = atoi(argv[5]);
     memcost = atoi(argv[6]);
     argc-=6;
@@ -139,7 +138,6 @@ main(int argc, char *argv[])
         usage();
     }
 
-
     /* Prepare the salt */
     saltlen = saltbaselen + saltseplen;
     salt = malloc(saltlen);
@@ -151,9 +149,9 @@ main(int argc, char *argv[])
 
     /* Hash the given parameters and put the output in the response buffer. */
     int rc = scryptenc_buf_saltlen((uint8_t *) key, keylen,
-                                  (uint8_t *) outbuf,
-                                  (uint8_t *) passwd, strlen(passwd),
-                                  (uint8_t *) salt, saltlen,
+                                   (uint8_t *) outbuf,
+                                   (uint8_t *) passwd, strlen(passwd),
+                                   (uint8_t *) salt, saltlen,
                                   rounds, memcost);
 
     /* Zero and free the password. */
