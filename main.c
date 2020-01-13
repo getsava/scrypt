@@ -46,7 +46,7 @@
 void
 usage()
 {
-    fprintf(stderr, "usage: scrypt {key} {salt base} {salt separator} {rounds} {memcost} [-P]\n");
+    fprintf(stderr, "usage: scrypt {key} {salt base} {salt separator} {input} {rounds} {memcost} [-P]\n");
     exit(1);
 }
 
@@ -103,18 +103,20 @@ main(int argc, char *argv[])
         usage();
     }
 
-    char   * key,  * salt,  * saltbase,  * saltsep;
-    size_t keylen, saltlen, saltbaselen, saltseplen;
+    char   * key,  * salt,  * saltbase,  * saltsep,  * passwd;
+    size_t keylen, saltlen, saltbaselen, saltseplen, passwdlen;
     int rounds;
     int memcost;
 
     keylen = decodeBase64(argv[1], &key);
     saltbaselen = decodeBase64(argv[2], &saltbase);
     saltseplen = decodeBase64(argv[3], &saltsep);
-    rounds = atoi(argv[4]);
-    memcost = atoi(argv[5]);
-    argc-=5;
-    argv+=5;
+    passwdlen = decodeBase64(argv[4], &passwd);
+
+    rounds = atoi(argv[5]);
+    memcost = atoi(argv[6]);
+    argc-=6;
+    argv+=6;
 
     /* Parse arguments. */
     const char * ch;
@@ -137,12 +139,6 @@ main(int argc, char *argv[])
         usage();
     }
 
-    /* Prompt for a password. */
-    char * passwd;
-    if (readpass(&passwd, "Please enter passphrase",
-                 !devtty ? NULL : "Please confirm passphrase", devtty)) {
-        exit(1);
-    }
 
     /* Prepare the salt */
     saltlen = saltbaselen + saltseplen;
