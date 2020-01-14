@@ -103,7 +103,7 @@ main(int argc, char *argv[])
         usage();
     }
 
-    char * key,  * salt, * saltbase, * saltsep, * passwd;
+    char * key,  * salt, * saltbase, * saltsep, * passwd, * _passwd;
     size_t keylen, saltlen, saltbaselen, saltseplen;
     int rounds;
     int memcost;
@@ -111,11 +111,16 @@ main(int argc, char *argv[])
     keylen = decodeBase64(argv[1], &key);
     saltbaselen = decodeBase64(argv[2], &saltbase);
     saltseplen = decodeBase64(argv[3], &saltsep);
-    passwd = argv[4];
+    _passwd = argv[4];
     rounds = atoi(argv[5]);
     memcost = atoi(argv[6]);
     argc-=6;
     argv+=6;
+
+    size_t inlen = strlen(_passwd);
+    passwd = malloc(inlen + 1);
+    strncpy(passwd, _passwd, inlen);
+    passwd[inlen] = '\0';
 
     /* Parse arguments. */
     const char * ch;
